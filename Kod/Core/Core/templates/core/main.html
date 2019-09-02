@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		{% load static %}
+    <!-- Bootstrap CSS -->
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+      <link rel="stylesheet" type="text/css" href={% static "core/global.css" %}>
+
+
+    <title>Visualizator</title>
+  </head>
+  <body>
+
+	<nav class="navbar navbar-dark sticky-top bg-dark">
+      <a class="navbar-brand" href="#">Visualizator</a>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row">
+        <nav class="col-md-2 sidebar">
+		<ul class="list-group list-group-root well" id="treeview">
+
+		</ul>
+        </nav>
+
+        <div class="col-md-8 ml-sm-auto pt-3 px-4">
+			<ol id="legenda" class="legenda">
+				<h3> Legend: </h3>
+				<hr />
+			</ol>
+			  <svg id="vizualizator" style="height: 600px"> </svg>
+        </div>
+
+		<div class="col-md-2">
+			<svg id="bird" style="border: 1px solid black; margin-top: 15px; margin-bottom: 20px; height: 120px; width:200px;"> </svg>
+				<a href="../core">
+				<button class="btn btn-default" type="submit">Choose a Datamaker</button>
+				</a>
+			<hr />
+
+			<form>
+				<label for="odabirVizualizatora">Choose a visualizator:</label>
+				<select class="form-control form-control-sm margin-bottom " id= "odabirVizualizatora" onchange="window.location.href=this.value;" onfocus="this.selectedIndex = -1;">
+                    {% if visualization_plugins %}
+                            {% for p in visualization_plugins %}
+				  <option value="../{{p.identifier}}">{{p.name}}</option>
+				    {% endfor %}
+                    {% else %}
+                        <option disabled>No visualizators found</option>
+										{% endif %}
+				</select>
+			</form>
+
+			<hr />
+
+
+				<input class="form-control form-control-sm margin-bottom " id="txtSearch" type="text" placeholder="Search graph elements">
+				<button class="btn btn-default margin-bottom" id="search">Search</button>
+				</br>
+				<input class="form-control form-control-sm margin-bottom " id="txtFilter" type="text" placeholder="Filter graph elements">
+				<div class="btn-group margin-bottom">
+				  <button class="btn btn-default" id="filter">Filter</button>
+				</div>
+				<div class="margin-bottom">
+					<input class="form-control form-control-sm margin-bottom " id="data-name" type="text" placeholder="File name">
+					<button class="btn btn-default" id="save-data">Save data</button>
+				</div>
+
+		</div>
+
+        </div>
+
+
+      </div>
+    </div>
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://d3js.org/d3.v3.js"></script>
+		<script src={% static "core/tree.js" %}></script>
+		<script src={% static "core/panZoom.js" %}></script>
+		<script src={% static "core/birdView.js" %}></script>
+		<script src={% static "core/searchFilter.js" %}></script>
+		<script src={% static "core/saveData.js" %}></script>
+		<script src={% static "core/customFunctions.js" %}></script>
+		{% block draw %}
+		{% endblock %}
+
+
+  </body>
+</html>

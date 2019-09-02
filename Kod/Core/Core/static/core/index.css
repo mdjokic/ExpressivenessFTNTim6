@@ -1,0 +1,54 @@
+body,html, .container-fluid {
+    height: 100%;
+}
+
+body {
+    background-image: linear-gradient(to right, #810c68, #7d2383, #70379e, #5649b9, #005bd1);
+}
+
+h1 {
+    color: white;
+    font-family: 'Righteous', sans-serif;
+    font-size: 10vh;
+}
+
+.img {
+    cursor: pointer;
+}
+
+h2 {
+    color: white;
+    font-family: 'Righteous', sans-serif;
+    font-size: 6vh;
+}
+
+#loader + label {
+    font-family: 'Righteous', sans-serif;
+    font-size: 1em;
+    font-weight: bold;
+    border-radius: 10px;
+    border: 2px solid rgb(95, 24, 114);
+    padding: 10px;
+    color: white;
+}
+
+#loader + label {
+	cursor: pointer;
+}
+
+input[type=submit] {
+    font-family: 'Righteous', sans-serif;
+    font-size: 1em;
+    font-weight: bold;
+    border-radius: 10px;
+    padding: 10px;
+    background-color: transparent;
+    border: 2px solid rgb(95, 24, 114);
+    color: white;
+    cursor: pointer;
+}
+
+#loader:focus + label,
+#loader + label:hover, input[type=submit]:hover {
+    background-color: rgb(49, 6, 61);
+}

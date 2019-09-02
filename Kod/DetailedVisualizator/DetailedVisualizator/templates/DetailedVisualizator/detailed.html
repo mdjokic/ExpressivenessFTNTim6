@@ -1,0 +1,200 @@
+{% extends "core/main.html" %}
+{% block draw %}
+<script>
+doDraw = function doDraw(data){   
+					var svg = d3.select("#vizualizator").select("g").html("")
+
+					//how far apart will it place nodes based on node size
+					var scalefactor = Math.ceil(data.nodes.length / 30)
+
+					// randomly placing nodes
+					$.each(data.nodes, function(i, d){
+							let m = i / 2;
+							let n = i % 2;
+	
+							let svg = d3.select("#vizualizator");
+							let width = $("#vizualizator")[0].clientWidth
+							let height = $("#vizualizator")[0].clientHeight
+							if(scalefactor != 1) {
+								if(d.x==0){
+										d.x = Math.random() * width * scalefactor - width
+								}
+								if(d.y==0){
+										d.y = Math.random() * height * scalefactor - height
+								}
+							} else {
+								if(d.x==0){
+										d.x = Math.random() * width
+								}
+								if(d.y==0){
+										d.y = Math.random() * height
+								}
+							}           
+					})
+	
+					// color categories for nodes
+					var c10 = d3.scale.category10();
+					
+					// updating link coordinates when a node is dragged
+					var drag = d3.behavior.drag()
+					.on("drag", function(d, i) {
+							d.x += d3.event.dx
+							d.y += d3.event.dy
+							d3.select(this).attr("transform", function(d,i)
+							{
+							return "translate(" + [ d.x,d.y ] + ")"
+							})
+							links.each(function(l, li) {
+							if (l.source == i) {
+									d3.select(this).attr("x1", d.x).attr("y1", d.y);
+							} else if (l.target == i) {
+									d3.select(this).attr("x2", d.x).attr("y2", d.y);
+							}
+							});
+					})
+					.on("dragstart", function(d) {
+							d3.event.sourceEvent.stopPropagation();   // cancel pan and zoom behavior
+					});
+	
+					// on-hover tooltip
+					var tooltip = d3.select("body")
+					.append("div")
+					.style("position", "absolute")
+					.style("z-index", "10")
+					.style("visibility", "hidden")
+					.style("padding", "5px")
+					.style("border-radius", "10px")
+					.style("background-color", "#d1d1e0")
+					.style("font-size", 28)
+					.style("font-family", "arial");
+	
+					var links = svg.selectAll("link")
+					.data(data.links)
+					.enter()
+					.append("line")
+					.attr("class", "link")
+					.attr("x1", function(l) {
+							var sourceNode = data.nodes.filter(function(d, i) {
+									return i == l.source
+							})[0];
+							d3.select(this).attr("y1", sourceNode.y);
+							return sourceNode.x
+					})
+					.attr("x2", function(l) {
+							var targetNode = data.nodes.filter(function(d, i) {
+									return i == l.target
+							})[0];
+							d3.select(this).attr("y2", targetNode.y);
+							return targetNode.x
+					})
+					.attr("fill", "none")
+					.attr("stroke", function(d){
+						return c10(d.type);
+					})
+					.attr("stroke-width", 2)
+					.attr("visibility", function(d){
+							if(d.hidden){
+									return "hidden";
+							}else{
+									return "visible";
+							}
+					})
+					.on("mouseover", function(d){
+						d3.select(this).attr("stroke", "red")
+						d3.select(this).attr("stroke-width", 10)
+						return tooltip.style("visibility", "visible").html(function(){
+									return "TYPE: " + d.type;
+							});
+					})
+					.on("mousemove", function(){
+							return tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");
+					})
+					.on("mouseout", function(d){
+						d3.select(this).attr("stroke", function(d){
+						return c10(d.type);
+					})
+						d3.select(this).attr("stroke-width", 2)
+						return tooltip.style("visibility", "hidden");
+					});
+	
+	
+					var nodes = svg.selectAll("g")
+					.data(data.nodes);
+	
+					var g = nodes
+					.enter()
+					.append("g")
+					.attr("transform", function(d, i) { 
+							return "translate(" + [ d.x, d.y ] + ")"; 
+					})
+					.attr("visibility", function(d){
+							if(d.hidden){
+									return "hidden";
+							}else{
+									return "visible";
+							}
+					})
+					.call(drag)
+	
+					g.append("circle")
+					.attr("class", "node")
+					.attr("stroke", function(d){
+							if(d.found){
+									return "black";
+							}
+					})
+					.attr("stroke-width", function(d){
+							if(d.found){
+									return 10;
+							}
+					})
+					.attr("r", 20)
+					.attr("fill", function(d){
+							return c10(d.type);
+					})    
+					.on("mouseover", function(d, i){
+							return tooltip.style("visibility", "visible").html(function(){
+									let str = "TYPE: "+d.type+"</br>DATA: "
+									$.each(d.data, function(key,value){
+											str = str + "</br>" + key + " : " + value;
+									})
+									return str;
+							});
+					})
+					.on("mousemove", function(){
+							return tooltip.style("top", (event.pageY-10)+"px").style("left",(event.pageX+10)+"px");
+					})
+					.on("mouseout", function(){
+							return tooltip.style("visibility", "hidden");
+					})  
+					// background rectangle for text
+					g.append("rect")
+					.attr("fill","#d1d1e0")
+					.attr("rx",5)
+					.attr("ry",5)
+
+					g.append("text") 
+					.attr("x", -20)
+					.attr("y", -20) 
+					.attr("font-family", "arial")
+					.text(function (d){
+							return d.name;
+					});
+	
+					svg.selectAll("rect")
+							.attr("x", function() { 
+									return -20 
+									})
+							.attr("y", function() { 
+									return -35 
+									})
+							.attr("width", function() { 
+									let bb = d3.select(this.parentNode).select("text").node().getBBox();
+									return bb.width;
+									})
+							.attr("height", function() { 
+									return 20
+									});
+                    }
+</script>
+{% endblock %}
